@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Propriedades</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f4f0 0%, #e8f5e8 100%);
+            min-height: 100vh;
+        }
+
+        .header-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(to right, #7ed321 0%, #7ed321 25%, #1a5c1a 25%, #1a5c1a 50%, #f5f0e8 50%, #f5f0e8 75%, #7ed321 75%, #7ed321 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 30%;
+            height: 100%;
+            background: #7ed321;
+            clip-path: polygon(0 0, 100% 0, 70% 100%, 0 100%);
+        }
+
+        .header-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 30%;
+            height: 100%;
+            background: #7ed321;
+            clip-path: polygon(30% 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .header-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #f5f0e8;
+            width: 50%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .header-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 25%;
+            height: 60%;
+            background: #1a5c1a;
+            clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 100%);
+            z-index: 2;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: -50px auto 0;
+            padding: 0 20px 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: white;
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            background: #e8f5e8;
+            color: #1a5c1a;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            background: #d0ecd0;
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #7ed321 0%, #6bc218 100%);
+            color: white;
+            box-shadow: 0 4px 10px rgba(126, 211, 33, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #1a5c1a;
+            margin-bottom: 25px;
+            font-size: 28px;
+            border-bottom: 3px solid #7ed321;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1a5c1a;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="datetime-local"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #d0ecd0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: #fafffe;
+        }
+
+        input[type="text"]:focus,
+        input[type="datetime-local"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #7ed321;
+            box-shadow: 0 0 0 3px rgba(126, 211, 33, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .checkbox-group {
+            background: #f8fcf8;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #d0ecd0;
+        }
+
+        .checkbox-item {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #7ed321;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #7ed321 0%, #6bc218 100%);
+            color: white;
+            padding: 15px 35px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(126, 211, 33, 0.2);
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(126, 211, 33, 0.3);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button-secondary {
+            background: #1a5c1a;
+            margin-top: 15px;
+        }
+
+        .button-secondary:hover {
+            background: #145014;
+        }
+
+        .records {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8fcf8;
+            border-radius: 8px;
+            border: 2px solid #d0ecd0;
+        }
+
+        .record-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #7ed321;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .record-item strong {
+            color: #1a5c1a;
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .header-image {
+                height: 150px;
+            }
+
+            .container {
+                margin-top: -30px;
+            }
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-image">
+        <div class="header-center"></div>
+        <div class="header-overlay"></div>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('funcionarios')">Funcionários</button>
+            <button class="tab-button" onclick="switchTab('clientes')">Clientes</button>
+        </div>
+
+        <!-- TAB FUNCIONÁRIOS -->
+        <div id="funcionarios" class="tab-content active">
+            <h2>Registro de Horas - Funcionários</h2>
+            <div id="successFunc" class="success-message"></div>
+            
+            <form id="formFuncionario">
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="nomeFuncionario">Nome do Funcionário</label>
+                        <input type="text" id="nomeFuncionario" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoria">Categoria</label>
+                        <select id="categoria" required>
+                            <option value="">Selecione...</option>
+                            <option value="Casa">Casa</option>
+                            <option value="Condomínio">Condomínio</option>
+                            <option value="Apartamento">Apartamento</option>
+                            <option value="Escritório">Escritório</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="dataHora">Data e Hora</label>
+                        <input type="datetime-local" id="dataHora" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="horas">Horas Trabalhadas</label>
+                        <input type="text" id="horas" placeholder="Ex: 8" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="button">Registrar Horas</button>
+            </form>
+
+            <div class="records" id="recordsFuncionarios">
+                <h3 style="color: #1a5c1a; margin-bottom: 15px;">Registros Salvos</h3>
+                <div id="listaRegistros"></div>
+            </div>
+        </div>
+
+        <!-- TAB CLIENTES -->
+        <div id="clientes" class="tab-content">
+            <h2>Área do Cliente</h2>
+            <div id="successClient" class="success-message"></div>
+            
+            <form id="formCliente">
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="nomeProprietario">Nome do Proprietário</label>
+                        <input type="text" id="nomeProprietario" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nomePropriedade">Nome da Propriedade</label>
+                        <input type="text" id="nomePropriedade" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="endereco">Endereço</label>
+                    <input type="text" id="endereco" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Serviços</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="entrada" name="servico" value="Informar Entrada na propriedade">
+                            <label for="entrada">Informar Entrada na propriedade</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="saida" name="servico" value="Informar Saída da Propriedade">
+                            <label for="saida">Informar Saída da Propriedade</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="limpeza" name="servico" value="Solicitar Limpeza EXTRA">
+                            <label for="limpeza">Solicitar Limpeza EXTRA</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="reparo" name="servico" value="Solicitar Reparo Urgente">
+                            <label for="reparo">Solicitar Reparo Urgente</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="relatorio" name="servico" value="Solicitar relatório de Visitas">
+                            <label for="relatorio">Solicitar relatório de Visitas</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="button">Enviar Solicitação</button>
+            </form>
+
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #d0ecd0;">
+                <h3 style="color: #1a5c1a; margin-bottom: 20px;">Reclamações</h3>
+                <form id="formReclamacao">
+                    <div class="form-group">
+                        <label for="reclamacao">Descreva sua reclamação (máx. 500 caracteres)</label>
+                        <textarea id="reclamacao" maxlength="500" placeholder="Digite sua reclamação aqui..."></textarea>
+                        <div class="char-counter">
+                            <span id="charCount">0</span>/500 caracteres
+                        </div>
+                    </div>
+                    <button type="submit" class="button button-secondary">Enviar Reclamação</button>
+                </form>
+            </div>
+
+            <div class="records" id="recordsClientes">
+                <h3 style="color: #1a5c1a; margin-bottom: 15px;">Solicitações Registradas</h3>
+                <div id="listaSolicitacoes"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let dadosFuncionarios = {};
+        let dadosClientes = {};
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+        }
+
+        function mostrarMensagem(elementId, mensagem) {
+            const el = document.getElementById(elementId);
+            el.textContent = mensagem;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        document.getElementById('formFuncionario').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nome = document.getElementById('nomeFuncionario').value;
+            const categoria = document.getElementById('categoria').value;
+            const dataHora = document.getElementById('dataHora').value;
+            const horas = document.getElementById('horas').value;
+
+            if (!dadosFuncionarios[nome]) {
+                dadosFuncionarios[nome] = [];
+            }
+
+            dadosFuncionarios[nome].push({
+                categoria,
+                dataHora,
+                horas,
+                timestamp: new Date().toLocaleString('pt-BR')
+            });
+
+            atualizarListaFuncionarios();
+            mostrarMensagem('successFunc', 'Horas registradas com sucesso!');
+            this.reset();
+        });
+
+        function atualizarListaFuncionarios() {
+            const lista = document.getElementById('listaRegistros');
+            lista.innerHTML = '';
+
+            for (const [nome, registros] of Object.entries(dadosFuncionarios)) {
+                registros.forEach((reg, idx) => {
+                    const item = document.createElement('div');
+                    item.className = 'record-item';
+                    item.innerHTML = `
+                        <strong>${nome}</strong> | ${reg.categoria} | 
+                        ${new Date(reg.dataHora).toLocaleString('pt-BR')} | 
+                        ${reg.horas} horas
+                    `;
+                    lista.appendChild(item);
+                });
+            }
+
+            if (lista.innerHTML === '') {
+                lista.innerHTML = '<p style="color: #666;">Nenhum registro ainda.</p>';
+            }
+        }
+
+        document.getElementById('formCliente').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const proprietario = document.getElementById('nomeProprietario').value;
+            const propriedade = document.getElementById('nomePropriedade').value;
+            const endereco = document.getElementById('endereco').value;
+            
+            const servicosSelecionados = [];
+            document.querySelectorAll('input[name="servico"]:checked').forEach(cb => {
+                servicosSelecionados.push(cb.value);
+            });
+
+            if (servicosSelecionados.length === 0) {
+                alert('Por favor, selecione pelo menos um serviço.');
+                return;
+            }
+
+            if (!dadosClientes[proprietario]) {
+                dadosClientes[proprietario] = [];
+            }
+
+            dadosClientes[proprietario].push({
+                propriedade,
+                endereco,
+                servicos: servicosSelecionados,
+                timestamp: new Date().toLocaleString('pt-BR')
+            });
+
+            atualizarListaClientes();
+            mostrarMensagem('successClient', 'Solicitação enviada com sucesso!');
+            this.reset();
+        });
+
+        document.getElementById('formReclamacao').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const reclamacao = document.getElementById('reclamacao').value;
+            
+            if (reclamacao.trim() === '') {
+                alert('Por favor, escreva sua reclamação.');
+                return;
+            }
+
+            mostrarMensagem('successClient', 'Reclamação enviada com sucesso! Entraremos em contato em breve.');
+            this.reset();
+            document.getElementById('charCount').textContent = '0';
+        });
+
+        document.getElementById('reclamacao').addEventListener('input', function() {
+            document.getElementById('charCount').textContent = this.value.length;
+        });
+
+        function atualizarListaClientes() {
+            const lista = document.getElementById('listaSolicitacoes');
+            lista.innerHTML = '';
+
+            for (const [proprietario, solicitacoes] of Object.entries(dadosClientes)) {
+                solicitacoes.forEach((sol, idx) => {
+                    const item = document.createElement('div');
+                    item.className = 'record-item';
+                    item.innerHTML = `
+                        <strong>${proprietario}</strong> | ${sol.propriedade}<br>
+                        <small>${sol.endereco}</small><br>
+                        <small>Serviços: ${sol.servicos.join(', ')}</small><br>
+                        <small style="color: #666;">${sol.timestamp}</small>
+                    `;
+                    lista.appendChild(item);
+                });
+            }
+
+            if (lista.innerHTML === '') {
+                lista.innerHTML = '<p style="color: #666;">Nenhuma solicitação ainda.</p>';
+            }
+        }
+
+        atualizarListaFuncionarios();
+        atualizarListaClientes();
+    </script>
+</body>
+</html>
